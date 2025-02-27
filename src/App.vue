@@ -5,9 +5,14 @@
 </template>
 
 <script setup>
-import ViewNotes from "./views/ViewNotes.vue";
-import ViewStats from "./views/ViewStats.vue";
+import { onMounted } from "vue";
 import NavBar from "./components/NavBar.vue";
+import { useNotesStore } from "./stores/notes";
+const notesStore = useNotesStore();
+
+onMounted(() => {
+  notesStore.fetchNotes();
+});
 </script>
 <style scoped>
 nav ul {

@@ -15,18 +15,24 @@
       </RouterLink>
       <button
         className="px-3 py-1 bg-[#FEECF0] text-[#DA3335] rounded-md hover:scale-105 transition cursor-pointer"
-        @click="handleDeleteNote"
+        @click="modals.isDeleteNote = true"
       >
         Delete
       </button>
+      <DeleteNote
+        v-if="modals.isDeleteNote"
+        v-model="modals.isDeleteNote"
+        :noteId="note.id"
+      />
     </div>
   </div>
 </template>
 
 <script setup>
 /* import */
-import { computed } from "vue";
-import { useNotesStore } from "@/stores/notes";
+import { computed, reactive } from "vue";
+
+import DeleteNote from "./DeleteNote.vue";
 /*
 props
 */
@@ -35,7 +41,7 @@ const props = defineProps({
     type: Object,
   },
 });
-const notesStore = useNotesStore();
+
 /**
  * computed
  */
@@ -44,9 +50,9 @@ const characterLength = computed(() => {
 });
 
 /**
- * methods
+ * models
  */
-const handleDeleteNote = () => {
-  notesStore.deleteNote(props.note.id);
-};
+const modals = reactive({
+  isDeleteNote: false,
+});
 </script>

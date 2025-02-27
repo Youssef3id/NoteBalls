@@ -7,6 +7,7 @@
       placeholder="Add a new note"
       :value="modelValue"
       @input="emit('update:modelValue', $event.target.value)"
+      v-auto-focus
     ></textarea>
     <div className="flex justify-end mt-2">
       <slot name="button" />
@@ -15,6 +16,7 @@
 </template>
 
 <script setup>
+import { vAutoFocus } from "@/directives/Autofocus";
 const props = defineProps({
   modelValue: {
     type: String,

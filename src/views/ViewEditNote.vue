@@ -9,7 +9,7 @@
             'cursor-pointer hover:scale-105 transition-all duration-300':
               newNote.length > 0,
           }"
-          @click="addNote"
+          @click="handelSaveClick"
           :disabled="newNote.length === 0"
         >
           Save
@@ -31,13 +31,14 @@ imports
 */
 import { ref } from "vue";
 import AddEditNote from "@/components/note/AddEditNote.vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import { useNotesStore } from "@/stores/notes";
 
 /*
 route
 */
 const route = useRoute();
+const router = useRouter();
 
 /*  
 newNote
@@ -45,4 +46,11 @@ newNote
 const newNote = ref("");
 const notesStore = useNotesStore();
 newNote.value = notesStore.getNoteById(route.params.id).content;
+/*
+methode
+*/
+const handelSaveClick = () => {
+  notesStore.updateNote(route.params.id, newNote.value);
+  router.push("/");
+};
 </script>

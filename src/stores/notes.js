@@ -1,60 +1,65 @@
 import { defineStore } from "pinia";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  deleteDoc,
+  doc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
+import { db } from "@/includes/firebase";
 
 export const useNotesStore = defineStore("notes", {
   // State: reactive state of the store
   state: () => ({
-    notes: [
-      {
-        id: 1,
-        content: "This is a sample note. You can edit or delete it.",
-      },
-      {
-        id: 2,
-        content: "any thig for note 2",
-      },
-    ],
+    notes: [],
   }),
   actions: {
-    addNote(noteContent) {
-      this.notes.push({
-        id: Date.now(),
+    async fetchNotes() {
+      const notesRef = collection(db, "notes");
+
+      onSnapshot(notesRef, (snapshot) => {
+        this.notes = [];
+
+        snapshot.forEach((doc) => {
+          this.notes.unshift({
+            id: doc.id,
+            content: doc.data().content,
+          });
+        });
+      });
+    },
+    async addNote(noteContent) {
+      const docRef = await addDoc(collection(db, "notes"), {
+        id: Date.now().toString(),
         content: noteContent,
       });
     },
-    deleteNote(id) {
-      this.notes = this.notes.filter((note) => note.id !== id);
+
+    async deleteNote(noteId) {
+      try {
+        await deleteDoc(doc(db, "notes", noteId));
+        console.log(`Note with ID ${noteId} deleted successfully!`);
+      } catch (error) {
+        console.error("Error deleting note:", error);
+      }
+    },
+    async updateNote(noteId, newContent) {
+      try {
+        const noteRef = doc(db, "notes", noteId);
+        await updateDoc(noteRef, {
+          content: newContent,
+        });
+        console.log(`Note with ID ${noteId} updated successfully!`);
+      } catch (error) {
+        console.error("Error updating note:", error);
+      }
     },
   },
   getters: {
     getNoteById: (state) => {
-      return (id) => state.notes.find((note) => note.id === parseInt(id));
+      return (id) => state.notes.find((note) => note.id === id);
     },
   },
-
-  // Getters: computed state based on the state
-  // getters: {
-  //   getNoteById: (state) => {
-  //     return (id) => state.notes.find((note) => note.id === id);
-  //   },
-  //   totalNotes: (state) => state.notes.length,
-  // },
-
-  // // Actions: methods that can modify the state
-  // actions: {
-  //   addNote(note) {
-  //     this.notes.push({ ...note, id: Date.now() });
-  //   },
-  //   deleteNote(id) {
-  //     const index = this.notes.findIndex((note) => note.id === id);
-  //     if (index !== -1) {
-  //       this.notes.splice(index, 1);
-  //     }
-  //   },
-  //   updateNote(id, updatedNote) {
-  //     const index = this.notes.findIndex((note) => note.id === id);
-  //     if (index !== -1) {
-  //       this.notes[index] = { ...this.notes[index], ...updatedNote };
-  //     }
-  //   },
-  // },
 });

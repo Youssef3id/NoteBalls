@@ -41,9 +41,6 @@ notes
 */
 const newNote = ref("");
 
-const handleInput = (event) => {
-  newNote.value = event.target.value;
-};
 /*
 methods
 */
